@@ -219,7 +219,7 @@ uint draw_C(){
 //TODO: put generic oracle builder in suqa
 #ifdef GPU
 __global__
-void kernel_qms_apply_W(double *const state_comp, uint len, uint q_acc, uint dev_W_mask_Enew, uint dev_bm_enes_new, double c){
+void kernel_qms_apply_W(double *const state_comp, uint len, uint q_acc, uint dev_W_mask_Enew, uint dev_bm_enes_new, double c, double curr_E_old){
     //XXX: since q_acc is the most significative qubit, we split the cycle beforehand
     int i = blockDim.x*blockIdx.x + threadIdx.x+len/2;    
     double fs1, fs2;
@@ -313,8 +313,8 @@ void apply_W(){
     DEBUG_CALL(std::cout<<"\n\nApply W"<<std::endl);
 
 #ifdef GPU
-    qms::kernel_qms_apply_W<<<suqa::blocks,suqa::threads, 0, suqa::stream1>>>(suqa::state.data_re, suqa::state.size(), bm_acc, W_mask_Enew, bm_enes_new[0], c_factor);
-    qms::kernel_qms_apply_W<<<suqa::blocks,suqa::threads, 0, suqa::stream2>>>(suqa::state.data_im, suqa::state.size(), bm_acc, W_mask_Enew, bm_enes_new[0], c_factor);
+    qms::kernel_qms_apply_W<<<suqa::blocks,suqa::threads, 0, suqa::stream1>>>(suqa::state.data_re, suqa::state.size(), bm_acc, W_mask_Enew, bm_enes_new[0], c_factor, curr_E_old);
+    qms::kernel_qms_apply_W<<<suqa::blocks,suqa::threads, 0, suqa::stream2>>>(suqa::state.data_im, suqa::state.size(), bm_acc, W_mask_Enew, bm_enes_new[0], c_factor, curr_E_old);
     cudaDeviceSynchronize();
 #else
     qms::func_qms_apply_W(bm_acc, W_mask_Enew, bm_enes_new[0], c_factor);

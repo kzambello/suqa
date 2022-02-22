@@ -14,11 +14,13 @@
 //const bmReg bm_qaux   =  {9, 10, 11};
 //const bmReg bm_qlink1 =  {12, 13, 14};
 
-const int syst_qbits = 3;      // number of system's qubit 
+const int syst_qbits = 4;      // number of system's qubit 
 
-const bmReg bm_spin={0,1,2};    
+const bmReg bm_spin={0,1,2,3};    
 //extern double g_beta;
-
+extern double t_param;
+extern double U_param;
+extern double mu_param;
 
 void init_state();
 

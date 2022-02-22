@@ -22,6 +22,9 @@ using namespace std;
 
 // simulation parameters
 double therm_beta;
+double t_coupling;
+double U_coupling;
+double mu;
 double h;
 int thermalization;
 
@@ -49,14 +52,20 @@ void save_measures(string outfilename){
 }
 
 int main(int argc, char** argv){
-    if(argc < 6){
-        printf("usage: %s <beta> <metro steps> <reset each> <num ene qbits> <output file path> [--max-reverse <max reverse attempts> (20)] [--seed <seed> (random)] [--ene-min <min energy> (0.0)] [--ene-max <max energy> (1.0)] [--PE-steps <steps of PE evolution> (10)] [--thermalization <steps> (100)] [--record-reverse]\n", argv[0]);
+    if(argc < 9){
+        printf("usage: %s <beta> <t> <U> <mu> <metro steps> <reset each> <num ene qbits> <output file path> [--max-reverse <max reverse attempts> (20)] [--seed <seed> (random)] [--ene-min <min energy> (0.0)] [--ene-max <max energy> (1.0)] [--PE-steps <steps of PE evolution> (10)] [--thermalization <steps> (100)] [--record-reverse]\n", argv[0]);
         exit(1);
     }
 
     parse_arguments(args, argc, argv);
 
     therm_beta = args.beta;
+    t_coupling = args.t;
+    U_coupling = args.U;
+    mu = args.mu;
+    t_param = t_coupling;
+    U_param = U_coupling;
+    mu_param = mu;
 //    g_beta = args.g_beta; // defined as extern in system.cuh
     thermalization = args.thermalization;
     qms::metro_steps = (uint)args.metro_steps;
@@ -133,6 +142,7 @@ int main(int argc, char** argv){
         DEBUG_CALL(cout<<"metro step: "<<s<<endl);
         take_measure = (s>s0+(uint)thermalization and (s-s0)%qms::reset_each ==0U);
         int ret = qms::metro_step(take_measure);
+        //cout<<"[s=" << s << ":m=" << take_measure << ":r=" << ret << "]";
 
         if(ret<0){ // failed rethermalization, reinitialize state
             init_state();
@@ -143,6 +153,7 @@ int main(int argc, char** argv){
             count_accepted++;
         }
         if(s%perc_mstep==0){
+            //cout<<"\n";
             cout<<"iteration: "<<s<<"/"<<qms::metro_steps<<endl;
             save_measures(outfilename);
         }
