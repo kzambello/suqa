@@ -19,10 +19,11 @@ struct arg_list{
     unsigned long long int seed = 0;
     double ene_min = 0.0;
     double ene_max = 1.0;
-    int pe_steps = 10; 
+    int pe_steps = 10;
     int thermalization = 100;
     bool record_reverse = false;
-    
+    int nbatches = 20;
+
     friend ostream& operator<<(ostream& o, const arg_list& al);
 };
 
@@ -42,6 +43,7 @@ ostream& operator<<(ostream& o, const arg_list& al){
     o<<"steps of PE evolution: "<<al.pe_steps<<endl;
     o<<"thermalization: "<<al.thermalization<<endl;
     o<<"record reverse: "<<al.record_reverse<<endl;
+    o<<"number of batches: "<<al.nbatches<<endl;
     return o;
 }
 
@@ -135,6 +137,15 @@ void parse_arguments(arg_list& args, int argc, char** argv){
        args.thermalization = stod(argmap_inv[tmp_idx+1].c_str(), NULL); 
     }
 
+    // (int) nbatches
+    tmp_idx = argmap["--nbatches"];
+    if(tmp_idx>=fixed_args){
+       if(tmp_idx+1>= argc)
+           throw "ERROR: set value after '--nbatches' flag"; 
+       
+       args.nbatches = atoi(argmap_inv[tmp_idx+1].c_str()); 
+    }
+
 
     // argument checking
     if(args.beta <= 0.0){
@@ -175,5 +186,9 @@ void parse_arguments(arg_list& args, int argc, char** argv){
 
     if(args.pe_steps <=0){
         throw "ERROR: argument <steps of PE evolution> non positive";
+    }
+
+    if(args.nbatches <=0){
+        throw "ERROR: argument <num batches> non positive";
     }
 }

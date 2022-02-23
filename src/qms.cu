@@ -53,7 +53,7 @@ void save_measures(string outfilename){
 
 int main(int argc, char** argv){
     if(argc < 9){
-        printf("usage: %s <beta> <t> <U> <mu> <metro steps> <reset each> <num ene qbits> <output file path> [--max-reverse <max reverse attempts> (20)] [--seed <seed> (random)] [--ene-min <min energy> (0.0)] [--ene-max <max energy> (1.0)] [--PE-steps <steps of PE evolution> (10)] [--thermalization <steps> (100)] [--record-reverse]\n", argv[0]);
+        printf("usage: %s <beta> <t> <U> <mu> <metro steps> <reset each> <num ene qbits> <output file path> [--max-reverse <max reverse attempts> (20)] [--seed <seed> (random)] [--ene-min <min energy> (0.0)] [--ene-max <max energy> (1.0)] [--PE-steps <steps of PE evolution> (10)] [--thermalization <steps> (100)] [--nbatches <num batches> (20)] [--record-reverse]\n", argv[0]);
         exit(1);
     }
 
@@ -68,6 +68,7 @@ int main(int argc, char** argv){
     mu_param = mu;
 //    g_beta = args.g_beta; // defined as extern in system.cuh
     thermalization = args.thermalization;
+    uint nbatches = (uint) args.nbatches;
     qms::metro_steps = (uint)args.metro_steps;
     qms::reset_each = (uint)args.reset_each;
     qms::ene_qbits = (uint)args.ene_qbits;
@@ -125,8 +126,7 @@ int main(int argc, char** argv){
     DEBUG_READ_STATE();
 
 
-    //TODO: make it an args option?
-    uint perc_mstep = (qms::metro_steps+19)/20; // batched saves
+    uint perc_mstep = (qms::metro_steps+(nbatches-1))/nbatches; // batched saves
     
     uint count_accepted = 0U;
     if(!file_exists(outfilename.c_str())){
