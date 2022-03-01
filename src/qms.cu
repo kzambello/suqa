@@ -53,7 +53,7 @@ void save_measures(string outfilename){
 
 int main(int argc, char** argv){
     if(argc < 9){
-        printf("usage: %s <beta> <t> <U> <mu> <metro steps> <reset each> <num ene qbits> <output file path> [--max-reverse <max reverse attempts> (20)] [--seed <seed> (random)] [--ene-min <min energy> (0.0)] [--ene-max <max energy> (1.0)] [--PE-steps <steps of PE evolution> (10)] [--thermalization <steps> (100)] [--nbatches <num batches> (20)] [--record-reverse]\n", argv[0]);
+        printf("usage: %s <beta> <t> <U> <mu> <metro steps> <reset each> <num ene qbits> <output file path> [--max-reverse <max reverse attempts> (100)] [--seed <seed> (random)] [--ene-min <min energy> (0.0)] [--ene-max <max energy> (1.0)] [--PE-steps <steps of PE evolution> (10)] [--thermalization <steps> (100)] [--nbatches <num batches> (20)] [--record-reverse]\n", argv[0]);
         exit(1);
     }
 
