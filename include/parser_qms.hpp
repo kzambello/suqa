@@ -23,6 +23,7 @@ struct arg_list{
     int thermalization = 100;
     bool record_reverse = false;
     int nbatches = 20;
+    int ene_threshold = 4;
 
     friend ostream& operator<<(ostream& o, const arg_list& al);
 };
@@ -44,6 +45,7 @@ ostream& operator<<(ostream& o, const arg_list& al){
     o<<"thermalization: "<<al.thermalization<<endl;
     o<<"record reverse: "<<al.record_reverse<<endl;
     o<<"number of batches: "<<al.nbatches<<endl;
+    o<<"ene threshold: "<<al.ene_threshold<<endl;
     return o;
 }
 
@@ -146,6 +148,15 @@ void parse_arguments(arg_list& args, int argc, char** argv){
        args.nbatches = atoi(argmap_inv[tmp_idx+1].c_str()); 
     }
 
+    // (int) ene-threshold
+    tmp_idx = argmap["--ene-threshold"];
+    if(tmp_idx>=fixed_args){
+       if(tmp_idx+1>= argc)
+           throw "ERROR: set value after '--ene-threshold' flag"; 
+       
+       args.ene_threshold = atoi(argmap_inv[tmp_idx+1].c_str()); 
+    }
+
 
     // argument checking
     if(args.beta <= 0.0){
@@ -189,6 +200,10 @@ void parse_arguments(arg_list& args, int argc, char** argv){
     }
 
     if(args.nbatches <=0){
+        throw "ERROR: argument <num batches> non positive";
+    }
+
+    if(args.ene_threshold <=0){
         throw "ERROR: argument <num batches> non positive";
     }
 }

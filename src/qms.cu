@@ -53,7 +53,7 @@ void save_measures(string outfilename){
 
 int main(int argc, char** argv){
     if(argc < 9){
-        printf("usage: %s <beta> <t> <U> <mu> <metro steps> <reset each> <num ene qbits> <output file path> [--max-reverse <max reverse attempts> (100)] [--seed <seed> (random)] [--ene-min <min energy> (0.0)] [--ene-max <max energy> (1.0)] [--PE-steps <steps of PE evolution> (10)] [--thermalization <steps> (100)] [--nbatches <num batches> (20)] [--record-reverse]\n", argv[0]);
+        printf("usage: %s <beta> <t> <U> <mu> <metro steps> <reset each> <num ene qbits> <output file path> [--max-reverse <max reverse attempts> (100)] [--seed <seed> (random)] [--ene-min <min energy> (0.0)] [--ene-max <max energy> (1.0)] [--PE-steps <steps of PE evolution> (10)] [--thermalization <steps> (100)] [--nbatches <num batches> (20)] [--ene-threshold <threshold> (4)] [--record-reverse]\n", argv[0]);
         exit(1);
     }
 
@@ -92,6 +92,8 @@ int main(int argc, char** argv){
     qms::t_PE_shift = args.ene_min;
     qms::t_PE_factor = (qms::ene_levels-1)/(double)(qms::ene_levels*(args.ene_max-args.ene_min)); 
     qms::t_phase_estimation = qms::t_PE_factor*8.*atan(1.0); // 2*pi*t_PE_factor
+
+    qms::ene_threshold = args.ene_threshold;
 
     
     // Banner
@@ -145,6 +147,7 @@ int main(int argc, char** argv){
         //cout<<"[s=" << s << ":m=" << take_measure << ":r=" << ret << "]";
 
         if(ret<0){ // failed rethermalization, reinitialize state
+            cout << "===> revert failed\n";
             init_state();
             //ensure new rethermalization
             s0 = s+1; 
