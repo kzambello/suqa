@@ -204,6 +204,6 @@ void parse_arguments(arg_list& args, int argc, char** argv){
     }
 
     if(args.ene_threshold <=0){
-        throw "ERROR: argument <num batches> non positive";
+        throw "ERROR: argument <ene threshold> non positive";
     }
 }
