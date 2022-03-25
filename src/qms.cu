@@ -147,7 +147,7 @@ int main(int argc, char** argv){
         //cout<<"[s=" << s << ":m=" << take_measure << ":r=" << ret << "]";
 
         if(ret<0){ // failed rethermalization, reinitialize state
-            cout << "===> revert failed\n";
+            //cout << "==> revert failed\n";
             init_state();
             //ensure new rethermalization
             s0 = s+1; 
