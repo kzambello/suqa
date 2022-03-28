@@ -50,7 +50,7 @@ void save_measures(string outfilename){
 
 int main(int argc, char** argv){
     if(argc < 7){
-        printf("usage: %s <beta> <g_beta> <metro steps> <reset each> <num ene qbits> <output file path> [--max-reverse <max reverse attempts> (20)] [--seed <seed> (random)] [--ene-min <min energy> (0.0)] [--ene-max <max energy> (1.0)] [--PE-steps <steps of PE evolution> (10)] [--thermalization <steps> (100)] [--record-reverse]\n", argv[0]);
+        printf("usage: %s <beta> <g_beta> <metro steps> <reset each> <num ene qbits> <output file path> [--max-reverse <max reverse attempts> (100)] [--seed <seed> (random)] [--ene-min <min energy> (0.0)] [--ene-max <max energy> (1.0)] [--PE-steps <steps of PE evolution> (10)] [--thermalization <steps> (100)] [--nbatches <num batches> (20)] [--ene-threshold <ene threshold> (4)] [--record-reverse]\n", argv[0]);
         exit(1);
     }
 
@@ -59,6 +59,7 @@ int main(int argc, char** argv){
     therm_beta = args.beta;
     g_beta = args.g_beta;
     thermalization = args.thermalization;
+    uint nbatches = (uint) args.nbatches;
     qms::metro_steps = (uint)args.metro_steps;
     qms::reset_each = (uint)args.reset_each;
     qms::ene_qbits = (uint)args.ene_qbits;
@@ -82,7 +83,7 @@ int main(int argc, char** argv){
     qms::t_PE_shift = args.ene_min;
     qms::t_PE_factor = (qms::ene_levels-1)/(double)(qms::ene_levels*(args.ene_max-args.ene_min)); 
     qms::t_phase_estimation = qms::t_PE_factor*8.*atan(1.0); // 2*pi*t_PE_factor
-
+    qms::ene_threshold = args.ene_threshold;
     
     // Banner
     suqa::print_banner();
@@ -116,9 +117,8 @@ int main(int argc, char** argv){
     DEBUG_READ_STATE();
 
 
-    //TODO: make it an args option?
-    uint perc_mstep = (qms::metro_steps+19)/20; // batched saves
-    
+    uint perc_mstep = (qms::metro_steps+(nbatches-1))/nbatches; // batched saves
+
     uint count_accepted = 0U;
     if(!file_exists(outfilename.c_str())){
         FILE * fil = fopen(outfilename.c_str(), "w");
@@ -133,8 +133,10 @@ int main(int argc, char** argv){
         DEBUG_CALL(cout<<"metro step: "<<s<<endl);
         take_measure = (s>s0+(uint)thermalization and (s-s0)%qms::reset_each ==0U);
         int ret = qms::metro_step(take_measure);
+        //cout<<"[s=" << s << ":m=" << take_measure << ":r=" << ret << "]";
 
         if(ret<0){ // failed rethermalization, reinitialize state
+            //cout << "==> revert failed\n";
             init_state();
             //ensure new rethermalization
             s0 = s+1; 
@@ -143,6 +145,7 @@ int main(int argc, char** argv){
             count_accepted++;
         }
         if(s%perc_mstep==0){
+            //cout<<"\n";
             cout<<"iteration: "<<s<<"/"<<qms::metro_steps<<endl;
             save_measures(outfilename);
         }

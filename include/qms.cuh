@@ -48,6 +48,7 @@ double t_PE_shift;
 int n_phase_estimation;
 uint gCi;
 uint c_acc = 0;
+uint ene_threshold;
 
 bool record_reverse=false;
 std::vector<uint> reverse_counters;
@@ -471,6 +472,7 @@ int metro_step(bool take_measure){
 #ifdef GATECOUNT
         gctr_reverse.new_record();
 #endif
+    //double min_delta = 1.0e+10;
     while(iters < max_reverse_attempts){
         apply_Phi();
 //        std::vector<uint> c_E_news(ene_qbits,0);
@@ -489,8 +491,14 @@ int metro_step(bool take_measure){
         suqa::measure_qbits(bm_enes_new, c_E_news, extract_rands(ene_qbits));
         Enew_meas = creg_to_uint(c_E_news);
         apply_Phi_inverse();
-        
-        if(curr_E_old == Enew_meas){
+
+        //if(curr_E_old == Enew_meas)        
+        double en_d = t_PE_shift+(Enew_meas)/(double)(t_PE_factor*ene_levels); 
+        double eo_d = t_PE_shift+(curr_E_old)/(double)(t_PE_factor*ene_levels);
+        double de_th = 1.0/(t_PE_factor) * (1.0 - 1.0/(double)(ene_levels));
+        de_th = ((double) qms::ene_threshold)  * de_th / ((double)(ene_levels));
+        //min_delta = std::abs(en_d-eo_d) < min_delta ? std::abs(en_d-eo_d) : min_delta;
+        if(std::abs(en_d-eo_d) < de_th){
             DEBUG_CALL(std::cout<<"  accepted restoration ("<<max_reverse_attempts-iters<<"/"<<max_reverse_attempts<<")"<<std::endl); 
             if(take_measure){
                 E_measures.push_back(curr_E_old_d);
@@ -526,6 +534,9 @@ int metro_step(bool take_measure){
         apply_U(); 
         suqa::measure_qbit(bm_acc, c_acc_trash, rangen.doub()); 
         apply_U_inverse(); 
+
+        //if( iters == (max_reverse_attempts-1))
+	//        std::cout<< "... eo_d = " << eo_d << " || min_delta = " << min_delta << " ...\n"; 
 
         iters++;
     }
