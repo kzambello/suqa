@@ -27,6 +27,9 @@ int main(int argc, char** argv){
 
 
    // g_beta = stod(argv[1]); // (extern) def in src/system.cu
+    t_param = 1.0;
+    U_param = 1.0;
+    mu_param = 1.0;
     int total_steps = atoi(argv[1]);
     double trotter_stepsize = stod(argv[2]);
     string outfilename = argv[3];
@@ -44,7 +47,7 @@ int main(int argc, char** argv){
 
     FILE * outfile;
 
-    init_state();
+    init_state_testevo();
     DEBUG_CALL(printf("initial state:\n"));
     DEBUG_READ_STATE();
 
@@ -71,7 +74,7 @@ int main(int argc, char** argv){
 //        plaq_val_std = sqrt((plaq_val_std/(double)num_hits - plaq_val*plaq_val)/(double)(num_hits-1));
 //        fprintf(outfile, "%.16lg %d %.16lg %.16lg\n", t, num_hits, plaq_val, plaq_val_std);
 
-        init_state();
+        init_state_testevo();
 //		suqa::apply_h(bm_spin[rangen.randint(0,3)]);
 //        printf("random number= %d\n", rangen.randint(0,3));
 //        DEBUG_READ_STATE();
@@ -81,18 +84,29 @@ int main(int argc, char** argv){
 
         //suqa::apply_h(state,  bm_spin[rangen.randint(0,3)]);
 	
-        double p000=0, p100=0, p010=0, p110=0, p001=0, p101=0, p011=0, p111=0;
-        suqa::prob_filter(bm_spin, {0U,0U,0U}, p000);
-        suqa::prob_filter(bm_spin, {1U,0U,0U}, p100);
-        suqa::prob_filter(bm_spin, {0U,1U,0U}, p010);
-        suqa::prob_filter(bm_spin, {1U,1U,0U}, p110);
-        suqa::prob_filter(bm_spin, {0U,0U,1U}, p001);
-        suqa::prob_filter(bm_spin, {1U,0U,1U}, p101);
-        suqa::prob_filter(bm_spin, {0U,1U,1U}, p011);
-        suqa::prob_filter(bm_spin, {1U,1U,1U}, p111);
-        DEBUG_CALL(printf("p000 = %.12lg; p100 = %.12lg\n", p000, p100));
+        double p0000=0, p0001=0, p0010=0, p0011=0, p0100=0, p0101=0, p0110=0, p0111=0, p1000=0, p1001=0, p1010=0, p1011=0, p1100=0, p1101=0, p1110=0, p1111=0;
+        suqa::prob_filter(bm_spin, {0U,0U,0U,0U}, p0000);
+        suqa::prob_filter(bm_spin, {0U,0U,0U,1U}, p0001);
+        suqa::prob_filter(bm_spin, {0U,0U,1U,0U}, p0010);
+        suqa::prob_filter(bm_spin, {0U,0U,1U,1U}, p0011);
+        suqa::prob_filter(bm_spin, {0U,1U,0U,0U}, p0100);
+        suqa::prob_filter(bm_spin, {0U,1U,0U,1U}, p0101);
+        suqa::prob_filter(bm_spin, {0U,1U,1U,0U}, p0110);
+        suqa::prob_filter(bm_spin, {0U,1U,1U,1U}, p0111);
+        suqa::prob_filter(bm_spin, {1U,0U,0U,0U}, p1000);
+        suqa::prob_filter(bm_spin, {1U,0U,0U,1U}, p1001);
+        suqa::prob_filter(bm_spin, {1U,0U,1U,0U}, p1010);
+        suqa::prob_filter(bm_spin, {1U,0U,1U,1U}, p1011);
+        suqa::prob_filter(bm_spin, {1U,1U,0U,0U}, p1100);
+        suqa::prob_filter(bm_spin, {1U,1U,0U,1U}, p1101);
+        suqa::prob_filter(bm_spin, {1U,1U,1U,0U}, p1110);
+        suqa::prob_filter(bm_spin, {1U,1U,1U,1U}, p1111);
+        DEBUG_CALL(printf("p0000 = %.12lg; p1000 = %.12lg\n", p0000, p1000));
         outfile = fopen(outfilename.c_str(), "a");
-        fprintf(outfile, "%.12lg %.12lg %.12lg %.12lg %.12lg %.12lg %.12lg %.12lg %.12lg\n", t, p000,p100, p010,p110, p001,p101, p011,p111);
+        if (ii == 0) {
+           fprintf(outfile, "#t, p0000, p0001, p0010, p0011, p0100, p0101, p0110, p0111, p1000, p1001, p1010, p1011, p1100, p1101, p1110, p1111\n");
+        }
+        fprintf(outfile, "%.6lg %.6lg %.6lg %.6lg %.6lg %.6lg %.6lg %.6lg %.6lg %.6lg %.6lg %.6lg %.6lg %.6lg %.6lg %.6lg %.6lg\n", t, p0000,p0001,p0010,p0011,p0100,p0101,p0110,p0111,p1000,p1001,p1010,p1011,p1100,p1101,p1110,p1111);
 
         fclose(outfile);
     }

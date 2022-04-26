@@ -23,6 +23,7 @@ extern double U_param;
 extern double mu_param;
 
 void init_state();
+void init_state_testevo();
 
 void evolution(const double& t, const int& n);
 

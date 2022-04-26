@@ -1,5 +1,6 @@
 #include "system.cuh"
 #include "Rand.hpp"
+#include <vector>
 
 double g_beta;
 double t_param;
@@ -13,9 +14,26 @@ void init_state(){
 //	suqa::apply_cx(bm_spin[1], bm_spin[0]);
 }
 
+void init_state_testevo(){
+    size_t dim = 1 << syst_qbits;
+
+    std::vector<double> re_coeff(dim, 0.0);
+    std::vector<double> im_coeff(dim, 0.0);
+
+    double re_coeff_1 = 0.435162146493599;
+    double re_coeff_2 = 0.557345410189304;
+
+    re_coeff[5] = re_coeff_1;
+    re_coeff[10] = re_coeff_1;
+    re_coeff[6] = re_coeff_2;
+    re_coeff[9] = re_coeff_2;
+
+    suqa::init_state(re_coeff,im_coeff);
+}
+
 
 void exp_it_id_x_x(const bmReg& q, uint pos_id, double phase_t){
-	
+
 	suqa::apply_pauli_TP_rotation({q[(pos_id+1)%4],q[(pos_id+2)%4]}, {PAULI_X,PAULI_X}, phase_t);
 
 }
