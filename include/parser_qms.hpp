@@ -171,9 +171,9 @@ void parse_arguments(arg_list& args, int argc, char** argv){
         throw "ERROR: argument <U> invalid";
     }
 
-    if(args.mu <= 0.0){
-        throw "ERROR: argument <mu> invalid";
-    }
+    //if(args.mu <= 0.0){
+    //    throw "ERROR: argument <mu> invalid";
+    //}
 
     if(args.metro_steps <= 0){
         throw "ERROR: argument <metro steps> invalid";
