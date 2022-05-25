@@ -45,7 +45,7 @@ void evolution(const double& t, const int& n){
 
     double fac_t = -t_param/2.0;
     double fac_U = U_param/4.0;
-    double fac_mu = mu_param/2.0;
+    double fac_mu = mu_param/2.0 - U_param/4.0;
     double fac_phase = (U_param/2.0 - 2.0*mu_param);
 
     fac_t = fac_t/N;
@@ -62,11 +62,7 @@ for (int it=0; it<N; it++) {
 
     // beta term
     suqa::apply_pauli_TP_rotation({bm_spin[0],bm_spin[2]}, {PAULI_Z,PAULI_Z}, -t*fac_U);
-    suqa::apply_pauli_TP_rotation({bm_spin[0]}, {PAULI_Z}, t*fac_U);
-    suqa::apply_pauli_TP_rotation({bm_spin[2]}, {PAULI_Z}, t*fac_U);
     suqa::apply_pauli_TP_rotation({bm_spin[1],bm_spin[3]}, {PAULI_Z,PAULI_Z}, -t*fac_U);
-    suqa::apply_pauli_TP_rotation({bm_spin[1]}, {PAULI_Z}, t*fac_U);
-    suqa::apply_pauli_TP_rotation({bm_spin[3]}, {PAULI_Z}, t*fac_U);
 
     // gamma term
     suqa::apply_pauli_TP_rotation({bm_spin[0]}, {PAULI_Z}, -t*fac_mu);
